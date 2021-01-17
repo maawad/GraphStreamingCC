@@ -227,3 +227,24 @@ if (DEFINED ENV{CI})
 else()
   target_compile_options(native_tests PRIVATE -g)
 endif ()
+
+add_executable(experiment
+        test/test_runner.cpp
+        test/util/graph_verifier.cpp
+        test/util/graph_gen.cpp
+        graph.cpp
+        supernode.cpp
+#        l0_sampling/sketch.cpp
+        l0_sampling/sketch_native.cpp
+        l0_sampling/update.cpp
+        util.cpp
+        test/experiment/EXPR1_massive_correctness_test.cpp
+        test/experiment/EXPR_2_small_gen_graphs_test.cpp)
+target_link_libraries(experiment PRIVATE xxHash::xxhash GTest::gtest)
+target_compile_definitions(experiment PRIVATE VERIFY_SAMPLES_F USE_NATIVE_F)
+# optimize
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(tests PRIVATE -O3)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  target_compile_options(tests PRIVATE /O2)
+endif()
