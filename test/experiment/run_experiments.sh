@@ -10,15 +10,14 @@ do
 	echo "input file: $input"
 	
 	mkdir test_`basename $input`_data
-	cp $input test/res/current_test.stream
-	total=1
-	for ((j=0; j < 5; j++))
+	ln -sf $input test/res/current_test.stream
+                
+        total=1
+	for ((j=0; j < 6; j++))
 	do
 		for ((size=1; size <= total; size*=2))
 		do
 			groups=$((total/size))
-
-			start=`date +%s`
 			
 			echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 			echo "num_groups=$((groups))"      >> streaming.conf
@@ -28,7 +27,6 @@ do
 			
 			mv runtime_data.txt test_`basename $input`_data/g$((groups))_s$((size))_data.txt
 			
-			end=`date +%s`
 		done
 		total=$((total*2))
 	done
