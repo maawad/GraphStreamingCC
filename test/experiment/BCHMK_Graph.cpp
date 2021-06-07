@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <ctime>
-#include <thread>
+
 #include "../../include/graph.h"
 #include "../util/graph_verifier.h"
 #include "../util/graph_gen.h"
