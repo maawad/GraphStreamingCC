@@ -82,7 +82,7 @@ TEST(Benchmark, BCHMKGraph) {
   std::thread querier(query_insertions, total, &g, start);
 
   while (m--) {
-    in >> u >> a >> b;
+    in >> std::skipws >> u >> a >> b;
     if (u == INSERT)
       g.update({{a, b}, INSERT});
     else
