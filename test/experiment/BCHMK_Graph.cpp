@@ -28,7 +28,7 @@ TEST(Benchmark, BCHMKGraph) {
   std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
   while (m--) {
-    in >> u >> a >> b;
+    in >> std::skipws >> u >> a >> b;
     if (u == INSERT)
       g.update({{a, b}, INSERT});
     else
