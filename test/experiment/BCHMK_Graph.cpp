@@ -4,10 +4,15 @@
 #include <ctime>
 
 #include "../../include/graph.h"
-#include "../util/graph_verifier.h"
-#include "../util/graph_gen.h"
 
-TEST(Benchmark, BCHMKGraph) {
+int main() {
+  // to use top/awk tool
+  int child_pid = fork();
+  if (child_pid != 0) {
+    std::cout << child_pid << std::endl;
+    return 0;
+  }
+
   const std::string fname = __FILE__;
   size_t pos = fname.find_last_of("\\/");
   const std::string curr_dir = (std::string::npos == pos) ? "" : fname.substr(0, pos);

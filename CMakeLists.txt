@@ -258,10 +258,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 add_executable(experiment_external
-  test/test_runner.cpp
   test/experiment/BCHMK_Graph.cpp
-  test/util/graph_verifier.cpp
-  test/util/graph_gen.cpp
   graph.cpp
   supernode.cpp
   graph_worker.cpp
@@ -274,24 +271,15 @@ target_compile_definitions(experiment_external PRIVATE USE_FBT_F)
 add_dependencies(experiment_external BufferTree)
 target_link_libraries(experiment_external PRIVATE libFastBufferTree.a)
 # optimize unless debug
-if (DEFINED ENV{DEBUG})
-  message("Disabling optimizations and enabling debug symbols")
-  target_compile_options(experiment_external PRIVATE -g -fopenmp)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_external PRIVATE -O3 -fopenmp)
   target_link_options(experiment_external PRIVATE -fopenmp)
-else ()
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(experiment_external PRIVATE -O3 -fopenmp)
-    target_link_options(experiment_external PRIVATE -fopenmp)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(experiment_external PRIVATE /O2)
-  endif()
-endif ()
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()
 
 add_executable(experiment_memory
-  test/test_runner.cpp
   test/experiment/BCHMK_Graph.cpp
-  test/util/graph_verifier.cpp
-  test/util/graph_gen.cpp
   graph.cpp
   supernode.cpp
   graph_worker.cpp
@@ -304,15 +292,9 @@ target_link_libraries(experiment_memory PRIVATE xxHash::xxhash GTest::gtest)
 add_dependencies(experiment_memory BufferTree)
 target_link_libraries(experiment_memory PRIVATE libFastBufferTree.a)
 # optimize unless debug
-if (DEFINED ENV{DEBUG})
-  message("Disabling optimizations and enabling debug symbols")
-  target_compile_options(experiment_memory PRIVATE -g -fopenmp)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_memory PRIVATE -O3 -fopenmp)
   target_link_options(experiment_memory PRIVATE -fopenmp)
-else ()
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(experiment_memory PRIVATE -O3 -fopenmp)
-    target_link_options(experiment_memory PRIVATE -fopenmp)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(experiment_memory PRIVATE /O2)
-  endif()
-endif ()
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()
