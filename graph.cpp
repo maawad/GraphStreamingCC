@@ -23,14 +23,11 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
   std::string buffer_loc_prefix = configure_system(); // read the configuration file to configure the system
 #ifdef USE_FBT_F
   // Create buffer tree and start the graphWorkers
-  bf = new BufferTree(buffer_loc_prefix, (1<<20), 8, num_nodes, GraphWorker::get_num_groups(), true);
+  bf = new BufferTree(buffer_loc_prefix, (1<<20), 16, num_nodes, GraphWorker::get_num_groups(), true);
   GraphWorker::start_workers(this, bf);
 #else
-  unsigned num_buckets = bucket_gen(num_nodes*num_nodes, 1); // TODO: don't fix num_bucket_factor
-  unsigned num_guesses = guess_gen(num_nodes*num_nodes);
-  unsigned node_size = sizeof(Supernode) + double_to_ull(log2(num_nodes))*(
-        sizeof(Sketch)
-        + num_buckets*num_guesses*(sizeof(vec_t) + sizeof(vec_hash_t)));
+  unsigned long node_size = 24*pow((log2(num_nodes)), 3);
+  node_size /= sizeof(Node);
   wq = new WorkQueue(node_size, num_nodes, 2*GraphWorker::get_num_groups());
   GraphWorker::start_workers(this, wq);
 #endif
