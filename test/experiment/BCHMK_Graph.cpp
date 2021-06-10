@@ -5,22 +5,16 @@
 
 #include "../../include/graph.h"
 
-int main() {
-  // to use top/awk tool
-  int child_pid = fork();
-  if (child_pid != 0) {
-    std::cout << child_pid << std::endl;
-    return 0;
+int main(int argc, char** argv) {
+  if (argc != 3) {
+    std::cout << "Incorrect number of arguments. "
+                 "Expected two but got " << argc-1 << std::endl;
+    exit(EXIT_FAILURE);
   }
 
-  const std::string fname = __FILE__;
-  size_t pos = fname.find_last_of("\\/");
-  const std::string curr_dir = (std::string::npos == pos) ? "" : fname.substr(0, pos);
-  
-  // before running this experiment, copy the test file to
-  // the 'current_test.stream' file. This is so tests can
-  // be automated.
-  ifstream in{curr_dir + "/../res/current_test.stream"};
+  std::cout << "Input stream: " << argv[1] << std::endl;
+  ifstream in{argv[1]};
+
   Node num_nodes;
   in >> num_nodes;
   long m;
@@ -39,10 +33,14 @@ int main() {
     else
       g.update({{a,b}, DELETE});
   }
+
+  std::cout << "Starting CC" << std::endl;
+
   uint64_t num_CC = g.connected_components().size();
   printf("Number of connected components is %lu\n", num_CC);
 
-  ofstream out{"runtime_data.txt"}; // open the outfile
+  ofstream out{argv[2]}; // open the outfile
+  std::cout << "Writing runtime stats to " << argv[2] << std::endl;
   std::chrono::duration<double> runtime = g.end_time - start;
 
   // calculate the insertion rate and write to file

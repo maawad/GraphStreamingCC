@@ -9,22 +9,17 @@
 executable=$1
 
 # for every input file specified on the command line
+mkdir ./results
+
 for input in "${@:2}"
 do
 	echo "input file: $input"
 
-	# TODO: put the code for running the memory profiler here
-	# & top ... | awk ... 
-	# TODO: pipe the above output to a file
-	
-	mkdir test_`basename $input`
-	ln -sf $input test/res/current_test.stream
-	
-	"$executable" # either experiment_memory or experiment_external
-	
-	mv runtime_data.txt test_`basename $input`/
-	# TODO: copy the awk output over as well.
+	mkdir results/test_`basename $input`
+
+	# either experiment_memory or experiment_external
+	$executable $input results/test_`basename $input`/runtime_data.txt & ./track.sh $! > results/test_`basename $input`/profiling_data.txt
 done
 
 # delete buffer tree data if it exists
-rm BUFFTREEDATA/*
+# rm BUFFTREEDATA/*
