@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <string>
-#include <ctime>
+#include <chrono>
 
 #include "../../include/graph.h"
 
 int main(int argc, char** argv) {
-  if (argc != 3) {
+  if (argc != 2) {
     std::cout << "Incorrect number of arguments. "
                  "Expected two but got " << argc-1 << std::endl;
     exit(EXIT_FAILURE);
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   uint8_t u;
   Graph g{num_nodes};
 
-  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  auto start = std::chrono::steady_clock::now();
 
   while (m--) {
     in >> std::skipws >> u >> a >> b;
@@ -37,11 +37,16 @@ int main(int argc, char** argv) {
   std::cout << "Starting CC" << std::endl;
 
   uint64_t num_CC = g.connected_components().size();
-  printf("Number of connected components is %lu\n", num_CC);
+  auto end = std::chrono::steady_clock::now();
+  long double time_taken = static_cast<std::chrono::duration<long double>>(end - start).count();
 
-  ofstream out{argv[2]}; // open the outfile
+  ofstream out{std::string(argv[1]) + "_stats.txt"}; // open the outfile
+  std::cout << "Number of connected components is " << num_CC << std::endl;
   std::cout << "Writing runtime stats to " << argv[2] << std::endl;
-  std::chrono::duration<double> runtime = g.end_time - start;
+
+  out << "Found " << num_CC << " connected components in " << time_taken << " seconds" << '\n';
+
+  std::chrono::duration<double> runtime  = g.end_time - start;
 
   // calculate the insertion rate and write to file
   // insertion rate measured in stream updates 
