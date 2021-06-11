@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
   ofstream out{std::string(argv[1]) + "_stats.txt"}; // open the outfile
   std::cout << "Number of connected components is " << num_CC << std::endl;
-  std::cout << "Writing runtime stats to " << argv[2] << std::endl;
+  std::cout << "Writing runtime stats to " << std::string(argv[1]) + "_stats.txt" << std::endl;
 
   out << "Found " << num_CC << " connected components in " << time_taken << " seconds" << '\n';
 
