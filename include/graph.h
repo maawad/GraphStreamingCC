@@ -89,6 +89,7 @@ public:
   // number of updates and time when updating completes
   std::atomic<uint64_t> num_updates;
   std::chrono::steady_clock::time_point end_time;
+  std::chrono::steady_clock::time_point CC_end_time;
 };
 
 class UpdateLockedException : public exception {

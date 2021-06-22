@@ -23,7 +23,7 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
   std::string buffer_loc_prefix = configure_system(); // read the configuration file to configure the system
 #ifdef USE_FBT_F
   // Create buffer tree and start the graphWorkers
-  bf = new BufferTree(buffer_loc_prefix, (1<<20), 16, num_nodes, GraphWorker::get_num_groups(), true);
+  bf = new BufferTree(buffer_loc_prefix, (1<<20), 64, num_nodes, GraphWorker::get_num_groups(), true);
   GraphWorker::start_workers(this, bf);
 #else
   unsigned long node_size = 24*pow((log2(num_nodes)), 3);
@@ -138,6 +138,7 @@ vector<set<Node>> Graph::connected_components() {
   verifier.verify_soln(retval);
 #endif
 
+  CC_end_time = std::chrono::steady_clock::now();
   return retval;
 }
 

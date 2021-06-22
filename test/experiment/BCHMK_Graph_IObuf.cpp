@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "../../include/graph.h"
+#include "../../include/BufferedEdgeInput.h"
 
 int main(int argc, char** argv) {
   if (argc != 2) {
@@ -14,26 +15,28 @@ int main(int argc, char** argv) {
   }
 
   // create the thread which will perform buffered IO for us
-  ifstream in{argv[1]};
+  std::cout << "Input stream: " << argv[1] << std::endl;
+  BufferedEdgeInput buffer(argv[1], 1000000);
 
-  Node num_nodes;
-  in >> num_nodes;
-  long m;
-  in >> m;
+  Node num_nodes = buffer.num_nodes;
+  long m = buffer.num_edges;
+
   long total = m;
-  Node a, b;
-  uint8_t u;
   Graph g{num_nodes};
 
+  std::cout << "num nodes = " << num_nodes << " num edges = " << m << std::endl;
+ 
   auto start = std::chrono::steady_clock::now();
   std::tuple<uint32_t, uint32_t, bool> edge;
   while (m--) {
-    in >> std::skipws >> u >> a >> b;
+    buffer.get_edge(edge);
 
-    if (u == INSERT)
-      g.update({{a, b}, INSERT});
+    //std::cout << std::get<0>(edge) << ", " << std::get<1>(edge) << std::endl; 
+
+    if (std::get<2>(edge) == INSERT)
+      g.update({{std::get<0>(edge), std::get<1>(edge)}, INSERT});
     else
-      g.update({{a, b}, DELETE});
+      g.update({{std::get<0>(edge), std::get<1>(edge)}, DELETE});
   }
 
   std::cout << "Starting CC" << std::endl;
