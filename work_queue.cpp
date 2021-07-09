@@ -7,8 +7,8 @@
 
 const unsigned first_idx = 2;
 
-WorkQueue::WorkQueue(uint32_t buffer_size, Node nodes, int queue_len) :
-buffer_size(buffer_size), cq(queue_len,buffer_size*sizeof(Node)),
+WorkQueue::WorkQueue(uint32_t bsize, Node nodes, int queue_len) :
+buffer_size(bsize / sizeof(Node)), cq(queue_len, buffer_size * sizeof(Node)),
 buffers(nodes) {
   for (Node i = 0; i < nodes; ++i) {
     buffers[i] = static_cast<Node *>(malloc(buffer_size * sizeof(Node)));
