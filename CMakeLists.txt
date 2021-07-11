@@ -147,6 +147,8 @@ include_directories("${Boost_INCLUDE_DIR}")
 # Install BufferTree Project
 ExternalProject_Add(
   BufferTree
+  
+  UPDATE_DISCONNECTED False
 
   PREFIX          BufferTree
   GIT_REPOSITORY  "https://github.com/Victor-C-Zhang/FastBufferTree.git"

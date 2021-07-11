@@ -27,7 +27,7 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
   GraphWorker::start_workers(this, bf);
 #else
   unsigned node_size = 24 * pow(log2(num_nodes), 3);
-  wq = new WorkQueue(node_size, num_nodes, 92);
+  wq = new WorkQueue(node_size, num_nodes, GraphWorker::get_num_groups() * 2);
   GraphWorker::start_workers(this, wq);
 #endif
 }
