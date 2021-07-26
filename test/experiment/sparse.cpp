@@ -8,12 +8,14 @@ using namespace std;
 // takes input n (nodes) and generates a paperclip graph
 signed main() {
   int n; cin >> n;
-  bool adj[n][n];
-  for (int i = 0; i < n; ++i) {
+  bool** adj = malloc(n*sizeof(bool*));
+  for (int i = 0; i <; ++i) {
+    adj[i] = malloc(n*sizeof(bool));
     for (int j = 0; j < n; ++j) {
       adj[i][j] = false;
     }
   }
+
   mt19937 generator;
   uniform_int_distribution<int> distribution(0,n);
   for (int i = 0; i < n; ++i) {
@@ -37,5 +39,10 @@ signed main() {
       }
     }
   }
+
+  for (int i = 0; i < n; ++i) {
+    free(adj[i]);
+  }
+  free(adj);
   return 0;
 }
