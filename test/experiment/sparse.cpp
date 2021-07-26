@@ -8,9 +8,9 @@ using namespace std;
 // takes input n (nodes) and generates a paperclip graph
 signed main() {
   int n; cin >> n;
-  bool** adj = malloc(n*sizeof(bool*));
+  bool** adj = (bool**) malloc(n*sizeof(bool*));
   for (int i = 0; i <; ++i) {
-    adj[i] = malloc(n*sizeof(bool));
+    adj[i] = (bool*) malloc(n*sizeof(bool));
     for (int j = 0; j < n; ++j) {
       adj[i][j] = false;
     }
