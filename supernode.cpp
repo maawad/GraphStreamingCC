@@ -78,8 +78,8 @@ Supernode* Supernode::delta_supernode(uint64_t n, long seed,
    * this was slow (at least on small graph inputs).
    */
 #pragma omp parallel for num_threads(GraphWorker::get_group_size()) default(shared)
-  for (auto & delta_sketch : delta_node->sketches) {
-    delta_sketch->batch_update(updates);
+  for (unsigned i = 0; i< delta_node->sketches.size(); ++i) { // MUST be canonical for loop for OpenMP!
+    delta_node->sketches[i]->batch_update(updates);
   }
   return delta_node;
 }
