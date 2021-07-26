@@ -18,5 +18,5 @@ TEST(Benchmark, BCHMKpostProcSingleOnPaperclipGraph) {
     in >> a >> b;
     g.update({{a, b}, INSERT});
   }
-  std::cout << g.connected_components().size() << std::endl;
+  std::cout << "Number of CCs: " << g.connected_components().size() <<std::endl;
 }
