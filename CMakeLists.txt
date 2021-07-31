@@ -168,11 +168,17 @@ link_directories(${CMAKE_CURRENT_BINARY_DIR}/BufferTree/prefix/lib)
 
 # AVAILABLE COMPILATION DEFINITIONS:
 # VERIFY_SAMPLES_F   Use a deterministic connected-components algorithm to
-#                    verify post-processing
+#                    verify post-processing.
+#
 # USE_NATIVE_F       ???
+#
 # USE_FBT_F          Use a Fast Buffer Tree living on secondary storage
 #                    (github.com/Victor-C-Zhang/FastBufferTree) to buffer updates
 #                    instead of in-memory buffering.
+#
+# PARALLEL_PP_F      Use parallel post-processing (connected components)
+#                    function.
+
 
 add_executable(tests
   test/test_runner.cpp
@@ -267,6 +273,7 @@ add_executable(experiment_external
   util.cpp)
 target_link_libraries(experiment_external PRIVATE xxHash::xxhash GTest::gtest)
 target_compile_definitions(experiment_external PRIVATE USE_FBT_F)
+target_compile_definitions(experiment_external PRIVATE PARALLEL_PP_F)
 # dependencies
 add_dependencies(experiment_external BufferTree)
 target_link_libraries(experiment_external PRIVATE libFastBufferTree.a)
@@ -288,6 +295,7 @@ add_executable(experiment_memory
   l0_sampling/update.cpp
   util.cpp)
 target_link_libraries(experiment_memory PRIVATE xxHash::xxhash GTest::gtest)
+target_compile_definitions(experiment_memory PRIVATE PARALLEL_PP_F)
 # dependencies
 add_dependencies(experiment_memory BufferTree)
 target_link_libraries(experiment_memory PRIVATE libFastBufferTree.a)
