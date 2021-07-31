@@ -48,6 +48,7 @@ void query_insertions(uint64_t total, Graph *g, std::chrono::steady_clock::time_
     printf("Progress:%s%s", std::string(percent, '=').c_str(), std::string(20 - percent, ' ').c_str());
     printf("| %i%% -- %.2f per second\r", percent * 5, ins_per_sec); fflush(stdout);
   }
+  sleep(1);
   printf("Progress:====================| Done\n");
   std::chrono::duration<double> runtime = g->end_time - start_time;
 

@@ -10,15 +10,14 @@ do
 	# Remove the last 2 lines from the file
 	sed "$(( $(wc -l <$file)-1 )),$ d" $file > /tmp/file_trunc
 	
-	#calculate the median point of the file
-	med=$(( $(wc -l <$file)/2 ))
+	#calculate the 70th percentile point of the file
+	percent=$(( $(wc -l <$file)*7/10 ))
 	
 	# sort the file
 	sort -g -k 2 /tmp/file_trunc > /tmp/file_sorted
 	
-	# print the median line
-	echo median
-	sed -n $((med))p /tmp/file_sorted
+	# print the 70th percentile line
+	sed -n $((percent))p /tmp/file_sorted
 
 	# cleanup
 	rm /tmp/file_trunc
