@@ -150,7 +150,7 @@ ExternalProject_Add(
 
   PREFIX          BufferTree
   GIT_REPOSITORY  "https://github.com/Victor-C-Zhang/FastBufferTree.git"
-  GIT_TAG         "bug_fix"
+  GIT_TAG         "async_3_electric-er"
 
   BUILD_ALWAYS    OFF
   INSTALL_DIR     ${CMAKE_CURRENT_BINARY_DIR}/BufferTree/prefix

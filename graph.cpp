@@ -23,7 +23,7 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
   std::string buffer_loc_prefix = configure_system(); // read the configuration file to configure the system
 #ifdef USE_FBT_F
   // Create buffer tree and start the graphWorkers
-  bf = new BufferTree(buffer_loc_prefix, (1<<20), 64, num_nodes, GraphWorker::get_num_groups(), true);
+  bf = new BufferTree(buffer_loc_prefix, (1<<23), 512, num_nodes, 1, GraphWorker::get_num_groups(), 8, true);
   GraphWorker::start_workers(this, bf);
 #else
   unsigned long node_size = 24*pow((log2(num_nodes)), 3);
