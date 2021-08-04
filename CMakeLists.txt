@@ -306,3 +306,19 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 else()
   message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
 endif()
+
+add_executable(experiment_throughput
+  test/buffer_throughput_test.cpp
+  work_queue.cpp
+  test/test_runner.cpp
+)
+target_link_libraries(experiment_throughput PRIVATE GTest::gtest)
+add_dependencies(experiment_throughput BufferTree)
+target_link_libraries(experiment_throughput PRIVATE libFastBufferTree.a)
+# optimize unless debug
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_throughput PRIVATE -O3 -fopenmp)
+  target_link_options(experiment_throughput PRIVATE -fopenmp)
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()

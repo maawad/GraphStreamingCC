@@ -6,7 +6,6 @@
 #define TEST_WORK_QUEUE_H
 
 #include <buffer_tree.h>
-#include "supernode.h"
 // TODO: switch references from Node to node_t in types, change CMake flags
 
 /**
@@ -15,7 +14,7 @@
 class WorkQueue {
   const uint32_t buffer_size; // size of a buffer (including metadata)
   CircularQueue cq;
-  std::vector<node_id_t*> buffers; // array dump of numbers for performance: DO NOT
+  std::vector<std::vector<node_id_t>> buffers; // array dump of numbers for performance: DO NOT
   // try to access directly!
 
   /**
@@ -40,7 +39,7 @@ public:
    * @param upd the edge update.
    * @return nothing.
    */
-  insert_ret_t insert(update_t upd);
+  insert_ret_t insert(const update_t &upd);
 
   /**
    * Ask the buffer queue for data and sleep if necessary until it is available.
