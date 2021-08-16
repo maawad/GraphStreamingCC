@@ -148,6 +148,7 @@ include_directories("${Boost_INCLUDE_DIR}")
 ExternalProject_Add(
   BufferTree
 
+  UPDATE_DISCONNECTED False
   PREFIX          BufferTree
   GIT_REPOSITORY  "https://github.com/Victor-C-Zhang/FastBufferTree.git"
   GIT_TAG         "async_3_electric-er"

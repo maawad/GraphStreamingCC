@@ -31,7 +31,7 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
   GraphWorker::start_workers(this, bf);
 #else
   unsigned long node_size = 24*pow((log2(num_nodes)), 3);
-  node_size /= sizeof(node_id_t);
+  node_size /= sizeof(node_id_t) * 4; // we want a fourth of a full buffer size
   wq = new WorkQueue(node_size, num_nodes, 2*GraphWorker::get_num_groups());
   GraphWorker::start_workers(this, wq);
 #endif
@@ -159,6 +159,7 @@ vector<set<Node>> Graph::parallel_connected_components() {
   wq->force_flush();
 #endif
   GraphWorker::pause_workers(); // wait for the workers to finish applying the updates
+  end_time = std::chrono::steady_clock::now();
   // after this point all updates have been processed from the buffer tree
 
   printf("Total number of updates to sketches before CC %lu\n", num_updates.load()); // REMOVE this later
@@ -232,6 +233,7 @@ vector<set<Node>> Graph::parallel_connected_components() {
   retval.reserve(temp.size());
   for (const auto& it : temp) retval.push_back(it.second);
 
+  CC_end_time = std::chrono::steady_clock::now();
   return retval;
 }
 

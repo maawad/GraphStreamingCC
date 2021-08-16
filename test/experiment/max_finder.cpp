@@ -91,8 +91,10 @@ signed main() {
   while (std::getline(std::cin, s)) {
     extract(arr, s);
     virt = std::max((int)arr[0], virt);
-    res = std::max((int)arr[1], res);
-    swap = std::max((int)arr[2], swap);
+    if((int)arr[1] + (int)arr[2] > res + swap) {    
+      res  = (int)arr[1];
+      swap = (int)arr[2];
+    }
   }
   assert(!std::cin);
   std::cout << "VIRT " << virt << endl;

@@ -33,7 +33,6 @@ void query_insertions(uint64_t total, Graph *g, std::chrono::steady_clock::time_
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::duration<double> total_diff = now - start;
     std::chrono::duration<double> cur_diff   = now - prev;
-    prev = now; // reset start time to right after query
 
     // calculate the insertion rate and write to file
     uint64_t upd_delta = updates - prev_updates;
@@ -50,7 +49,7 @@ void query_insertions(uint64_t total, Graph *g, std::chrono::steady_clock::time_
       out << "Total runtime so far: " << (int) total_diff.count() << "\n\n";
 
       prev_updates += upd_delta;
-      printf("total updates = %lu", updates);
+      prev = now; // reset start time to right after query
     }
     
     if (updates >= total)
@@ -59,7 +58,7 @@ void query_insertions(uint64_t total, Graph *g, std::chrono::steady_clock::time_
     // display the progress
     int progress = updates / (total * .05);
     printf("Progress:%s%s", std::string(progress, '=').c_str(), std::string(20 - progress, ' ').c_str());
-    printf("| %i%% -- %.2f per second\r", progress * 5, ins_per_sec); fflush(stdout);
+    printf("| %i%% -- %i per second\r", progress * 5, ins_per_sec); fflush(stdout);
   }
   printf("Progress:====================| Done      \n");
   out.close();
