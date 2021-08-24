@@ -66,6 +66,11 @@ public:
    */
   vector<set<Node>> connected_components();
 
+  /**
+   * Parallel version of Boruvka.
+   * @return a vector of the connected components in the graph.
+   */
+  vector<set<Node>> parallel_connected_components();
   /*
    * Call this function to indicate to the graph that it should
    * begin accepting updates again. It is important that the sketches
@@ -89,6 +94,9 @@ public:
   // number of updates and time when updating completes
   std::atomic<uint64_t> num_updates;
   std::chrono::steady_clock::time_point end_time;
+
+  static Supernode* generate_delta_node(uint64_t node_n, long node_seed, uint64_t src,
+                                  const vector<uint64_t> &edges);
 };
 
 class UpdateLockedException : public exception {

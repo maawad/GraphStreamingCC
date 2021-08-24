@@ -41,18 +41,6 @@ do
 	echo "group_size=10"              >> streaming.conf
 	"$executable"			
 	mv runtime_data.txt test_`basename $input`_data/g4_s10_data.txt
-
-	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
-	echo "num_groups=2"               >> streaming.conf
-	echo "group_size=20"              >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g2_s20_data.txt
-	
-	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
-	echo "num_groups=1"               >> streaming.conf
-	echo "group_size=40"              >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g1_s40_data.txt
 done
 
 # delete buffer tree data if it exists
