@@ -25,19 +25,29 @@ class Sketch {
   // Factor for how many buckets there are in this sketch.
   double num_bucket_factor;
 
-  // Buckets of this sketch.
+  // Flag to keep track if this sketch has already been queried.
+  bool already_quered = false;
+
+  // Buckets of this sketch. The buckets are stored in memory following the class.
   // Length is bucket_gen(n, num_bucket_factor) * guess_gen(n).
   // For buckets[i * guess_gen(n) + j], the bucket has a 1/2^j probability
   // of containing an index.
-  std::vector<vec_t> bucket_a;
-  std::vector<vec_hash_t> bucket_c;
-  // Flag to keep track if this sketch has already been queried.
-  bool already_quered = false;
+  inline vec_t* bucket_a(vec_t idx) const {
+    return (vec_t*)((char *)this + sizeof(Sketch) + (idx * sizeof(vec_t)));
+  }
+  inline vec_hash_t* bucket_c(vec_t idx) const {
+    return (vec_hash_t*)((char *)this + sizeof(Sketch) + offset_c + (idx * sizeof(vec_hash_t)));
+  }
 
   FRIEND_TEST(SketchTestSuite, TestExceptions);
   FRIEND_TEST(EXPR_Parallelism, N10kU100k);
 
 public:
+  static long bytes_size; // size of a sketch and associated vectors
+  // how far after bucket_a is the beginning of bucket_c
+  static long offset_c;
+  static long num_entries(vec_t n, double num_bucket_factor=.5);
+
   /**
    * Construct a sketch of a vector of size n
    * @param n Length of the vector to sketch.

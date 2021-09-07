@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
 #Uncomment to enable debug
-#set(ENV{DEBUG} ON)
+set(ENV{DEBUG} ON)
 
 project(test)
 
@@ -258,7 +258,7 @@ add_executable(efficient_gen
   test/util/efficient_gen/edge_gen.cpp
   test/util/efficient_gen/cum_gen.cpp
   test/util/efficient_gen/efficient_gen.cpp)
-target_link_libraries(efficient_gen PRIVATE xxHash::xxhash)
+target_link_libraries(efficient_gen PRIVATE xxHash::xxhash GTest::gtest)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(efficient_gen PRIVATE -O3)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

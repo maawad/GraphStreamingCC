@@ -5,30 +5,36 @@
 #include "include/util.h"
 #include "include/graph_worker.h"
 
-Supernode::Supernode(uint64_t n, long seed): sketches(log2(n)), idx(0), logn(log2
-(n)), seed(seed), n(n) {
+long Supernode::bytes_size = sizeof(Supernode);
+
+Supernode::Supernode(uint64_t n, long seed): idx(0), logn(log2
+(n)), n(n), seed(seed) {
+  Sketch::offset_c = Sketch::num_entries(n) * sizeof(vec_t);
+
   // generate logn sketches for each supernode (read: node)
   for (int i=0;i<logn;++i)
-    sketches[i] = new Sketch(n*n, seed++);
+    new (get_sketch(i)) Sketch(n*n, seed++);
 }
 
 Supernode::Supernode(uint64_t n, long seed, std::fstream& binary_in) :
-sketches(log2(n)), idx(0), logn(log2(n)), n(n), seed(seed) {
+ idx(0), logn(log2(n)), n(n), seed(seed) {
+  Sketch::offset_c = Sketch::num_entries(n) * sizeof(vec_t);
+
   for (int i = 0; i < logn; ++i) {
-    sketches[i] = new Sketch(n*n, seed++, binary_in);
+    new (get_sketch(i)) Sketch(n*n, seed++, binary_in);
   }
 }
 
 Supernode::~Supernode() {
   for (int i=0;i<logn;++i)
-    delete sketches[i];
+    delete get_sketch(i);
 }
 
 boost::optional<Edge> Supernode::sample() {
   if (idx == logn) throw OutOfQueriesException();
   vec_t query_idx;
   try {
-    query_idx = sketches[idx++]->query();
+    query_idx = get_sketch(idx++)->query();
   } catch (AllBucketsZeroException &e) {
     return {};
   }
@@ -38,26 +44,27 @@ boost::optional<Edge> Supernode::sample() {
 void Supernode::merge(Supernode &other) {
   idx = max(idx, other.idx);
   for (int i=idx;i<logn;++i) {
-    (*sketches[i])+=(*other.sketches[i]);
+    (*get_sketch(i))+=(*other.get_sketch(i));
   }
 }
 
 void Supernode::update(vec_t upd) {
-  for (Sketch* s : sketches)
-    s->update(upd);
+  for (int i=idx;i<logn;++i)
+    get_sketch(i)->update(upd);
 }
 
 void Supernode::apply_delta_update(const Supernode* delta_node) {
   std::unique_lock<std::mutex> lk(node_mt);
-  for (unsigned i = 0; i < sketches.size(); ++i) {
-    *sketches[i] += *delta_node->sketches[i];
+  for (int i = 0; i < logn; ++i) {
+    *get_sketch(i) += *(delta_node->get_sketch(i));
   }
   lk.unlock();
 }
 
 Supernode* Supernode::delta_supernode(uint64_t n, long seed,
                                      const vector<vec_t> &updates) {
-  auto* delta_node = new Supernode(n, seed);
+  char *mem = (char *) malloc(bytes_size); // malloc some memory for our delta_node and it's sketches TODO: assign each graph worker a supernode object which it will use here
+  auto* delta_node = new (mem) Supernode(n, seed);
   /*
    * Consider fiddling with environment vars
    * OMP_DYNAMIC: whether the OS is allowed to dynamically change the number
@@ -80,14 +87,14 @@ Supernode* Supernode::delta_supernode(uint64_t n, long seed,
    * this was slow (at least on small graph inputs).
    */
 #pragma omp parallel for num_threads(GraphWorker::get_group_size()) default(shared)
-  for (auto & delta_sketch : delta_node->sketches) {
-    delta_sketch->batch_update(updates);
+  for (int i = 0; i < delta_node->logn; i++) {
+    delta_node->get_sketch(i)->batch_update(updates);
   }
   return delta_node;
 }
 
 void Supernode::write_binary(std::fstream& binary_out) {
   for (int i = 0; i < logn; ++i) {
-    sketches[i]->write_binary(binary_out);
+    get_sketch(i)->write_binary(binary_out);
   }
 }

@@ -17,9 +17,21 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
   seed = time(nullptr);
   srand(seed);
   seed = rand();
+
+  // 1. figure out how much memory to reserve
+  // size of a sketch
+  long vec_len = Sketch::num_entries(num_nodes);
+  long total_vector_len = vec_len * sizeof(vec_t) + vec_len * sizeof(vec_hash_t);
+  Sketch::bytes_size = sizeof(Sketch) + total_vector_len;
+  // size of a supernode
+  Supernode::bytes_size = sizeof(Supernode) + log2(num_nodes) * Sketch::bytes_size;
+
+  // 2. malloc the memory
+  memory = (char *) malloc(Supernode::bytes_size * num_nodes);
+
   for (Node i=0;i<num_nodes;++i) {
     representatives->insert(i);
-    supernodes[i] = new Supernode(num_nodes,seed);
+    supernodes[i] = new (memory + Supernode::bytes_size * i) Supernode(num_nodes,seed);
     parent[i] = i;
   }
   num_updates = 0; // REMOVE this later
@@ -66,8 +78,9 @@ Graph::Graph(const std::string& input_file) : num_updates(0) {
 }
 
 Graph::~Graph() {
-  for (unsigned i=0;i<num_nodes;++i)
-    delete supernodes[i];
+  // for (unsigned i=0;i<num_nodes;++i)
+  //   delete supernodes[i];
+  free(memory);
   delete[] supernodes;
   delete[] parent;
   delete representatives;
@@ -77,6 +90,7 @@ Graph::~Graph() {
 #else
   delete wq;
 #endif
+
 }
 
 void Graph::update(GraphUpdate upd) {
@@ -115,7 +129,7 @@ void Graph::batch_update(uint64_t src, const std::vector<uint64_t>& edges) {
   auto* delta_node = generate_delta_node(supernodes[src]->n,
                                          supernodes[src]->seed, src, edges);
   supernodes[src]->apply_delta_update(delta_node);
-  delete(delta_node);
+  // delete(delta_node);
 }
 
 vector<set<Node>> Graph::connected_components() {

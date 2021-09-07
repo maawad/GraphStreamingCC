@@ -49,6 +49,9 @@ class Graph {
   // In-memory buffering system
   WorkQueue *wq;
 #endif
+
+  // virtually contiguous memory where we will store supernodes
+  char *memory;
 public:
   explicit Graph(uint64_t num_nodes);
   explicit Graph(const string &input_file);

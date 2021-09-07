@@ -13,9 +13,6 @@ typedef std::pair<Node, Node> Edge;
  * box without needing to worry about implementing l_0.
  */
 class Supernode {
-  /* collection of logn sketches to query from, since we can't query from one
-     sketch more than once */
-  vector<Sketch*> sketches;
   int idx;
   int logn;
   std::mutex node_mt;
@@ -25,7 +22,16 @@ class Supernode {
   FRIEND_TEST(SupernodeTestSuite, TestSerialization);
   FRIEND_TEST(EXPR_Parallelism, N10kU100k);
 
+  /* collection of logn sketches to query from, since we can't query from one
+     sketch more than once */
+  inline Sketch* get_sketch(int sketch_id) const {
+    // TODO add the additional memory at the end of the sketches
+    return (Sketch*) ((char *)this + sizeof(Supernode) + ((sizeof(Sketch) + 0 ) * sketch_id));
+  }
+
 public:
+  static long bytes_size; // size of a supernode and associated sketches
+
   const uint64_t n; // for creating a copy
   const long seed; // for creating a copy
   /**

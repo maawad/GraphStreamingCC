@@ -183,7 +183,7 @@ TEST_F(SupernodeTestSuite, TestBatchUpdate) {
   ASSERT_EQ(supernode.logn, supernode_batch.logn);
   ASSERT_EQ(supernode.idx, supernode_batch.idx);
   for (int i=0;i<supernode.logn;++i) {
-    ASSERT_EQ(*supernode.sketches[i], *supernode_batch.sketches[i]);
+    ASSERT_EQ(*supernode.get_sketch(i), *supernode_batch.get_sketch(i));
   }
 }
 
@@ -234,7 +234,7 @@ TEST_F(SupernodeTestSuite, TestConcurrency) {
   }
 
   for (int i = 0; i < supernode.logn; ++i) {
-    ASSERT_EQ(*supernode.sketches[i], *piecemeal.sketches[i]);
+    ASSERT_EQ(*supernode.get_sketch(i), *piecemeal.get_sketch(i));
   }
 }
 
@@ -263,6 +263,6 @@ TEST_F(SupernodeTestSuite, TestSerialization) {
   Supernode reheated { num_nodes, seed, in_file };
 
   for (int i = 0; i < snodes[num_nodes / 2]->logn; ++i) {
-    ASSERT_EQ(*snodes[num_nodes / 2]->sketches[i], *reheated.sketches[i]);
+    ASSERT_EQ(*snodes[num_nodes / 2]->get_sketch(i), *reheated.get_sketch(i));
   }
 }
