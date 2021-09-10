@@ -39,7 +39,7 @@ Graph::Graph(uint64_t num_nodes): num_nodes(num_nodes) {
 #endif
 }
 
-Graph::Graph(const std::string& input_file) : num_updates(0) {
+Graph::Graph(const std::string& input_file) {
   double num_bucket_factor;
   auto binary_in = std::fstream(input_file, std::ios::in | std::ios::binary);
   binary_in.read((char*)&seed, sizeof(long));
@@ -59,10 +59,11 @@ Graph::Graph(const std::string& input_file) : num_updates(0) {
     parent[i] = i;
   }
   binary_in.close();
+  num_updates = 0;
   std::string buffer_loc_prefix = configure_system(); // read the configuration file to configure the system
 #ifdef USE_FBT_F
   // Create buffer tree and start the graphWorkers
-  bf = new BufferTree(buffer_loc_prefix, (1<<20), 16, num_nodes, GraphWorker::get_num_groups(), true);
+  bf = new BufferTree(buffer_loc_prefix, (1<<23), 512, num_nodes, 1, GraphWorker::get_num_groups(), 8, true);
   GraphWorker::start_workers(this, bf, Supernode::get_size());
 #else
   unsigned long node_size = 24*pow((log2(num_nodes)), 3);
@@ -197,8 +198,7 @@ vector<set<Node>> Graph::parallel_connected_components() {
   GraphWorker::pause_workers(); // wait for the workers to finish applying the updates
   end_time = std::chrono::steady_clock::now();
   // after this point all updates have been processed from the buffer tree
-  end_time = std::chrono::steady_clock::now();
-  printf("Total number of updates to sketches before CC %lu\n", num_updates.load()); // REMOVE this later
+  // printf("Total number of updates to sketches before CC %lu\n", num_updates.load()); // REMOVE this later
   update_locked = true; // disallow updating the graph after we run the alg
   bool modified;
 #ifdef VERIFY_SAMPLES_F

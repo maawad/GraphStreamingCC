@@ -4,6 +4,7 @@
 #include <ctime>
 #include <sstream>
 #include <thread>
+#include <iostream>
 
 #include "../../include/graph.h"
 #include "../../include/binary_graph_stream.h"
@@ -111,3 +112,4 @@ int main(int argc, char** argv) {
 
   out << "Connected Components algorithm took " << CC_time << " and found " << num_CC << " CC\n";
   out.close();
+}
