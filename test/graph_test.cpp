@@ -96,22 +96,24 @@ TEST(GraphTestSuite, TestCorrectnessOfReheating) {
     ifstream in{"./sample.txt"};
     Node n, m;
     in >> n >> m;
-    Graph g{n};
+    Graph* g = new Graph(n);
     int type, a, b;
     while (m--) {
       in >> type >> a >> b;
       if (type == INSERT) {
-        g.update({{a, b}, INSERT});
-      } else g.update({{a, b}, DELETE});
+        g->update({{a, b}, INSERT});
+      } else g->update({{a, b}, DELETE});
     }
-    g.set_cum_in("./cum_sample.txt");
-    g.write_binary("./out_temp.txt");
-    auto g_res = g.connected_components();
+    g->set_cum_in("./cum_sample.txt");
+    g->write_binary("./out_temp.txt");
+    auto g_res = g->connected_components();
     printf("number of CC = %lu\n", g_res.size());
+    delete g;
 
-    Graph reheated {"./out_temp.txt"};
+    Graph* reheated = new Graph("./out_temp.txt");
+    auto reheated_res = reheated->connected_components();
+    delete reheated;
 
-    auto reheated_res = reheated.connected_components();
     printf("number of reheated CC = %lu\n", reheated_res.size());
     ASSERT_EQ(g_res.size(), reheated_res.size());
     for (unsigned i = 0; i < g_res.size(); ++i) {
