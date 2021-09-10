@@ -3,38 +3,38 @@
 //
 
 #include "include/work_queue.h"
-#include "include/graph_worker.h"
+#include <cassert>
 
 const unsigned first_idx = 2;
 
 WorkQueue::WorkQueue(uint32_t buffer_size, Node nodes, int queue_len) :
 buffer_size(buffer_size), cq(queue_len,buffer_size*sizeof(node_id_t)),
-buffers(nodes) {
+buffers() {
   for (Node i = 0; i < nodes; ++i) {
-    buffers[i] = static_cast<node_id_t *>(malloc(buffer_size * sizeof(node_id_t)));
-    buffers[i][0] = first_idx; // first spot will point to the next free space
-    buffers[i][1] = i; // second spot identifies the node to which the buffer
-    // belongs
+    buffers.emplace_back();
+    buffers[i].reserve(buffer_size);
+    buffers[i].push_back(first_idx);
+    buffers[i].push_back(i);
   }
 }
 
 WorkQueue::~WorkQueue() {
-  for (auto & buffer : buffers) {
-    free(buffer);
-  }
 }
 
 void WorkQueue::flush(node_id_t *buffer, uint32_t num_bytes) {
   cq.push(reinterpret_cast<char *>(buffer), num_bytes);
 }
 
-insert_ret_t WorkQueue::insert(update_t upd) {
-  node_id_t& idx = buffers[upd.first][0];
-  buffers[upd.first][idx] = (node_id_t) upd.second;
-  ++idx;
-  if (idx == buffer_size) { // full, so request flush
-    flush(buffers[upd.first], buffer_size*sizeof(node_id_t));
-    idx = first_idx;
+insert_ret_t WorkQueue::insert(const update_t &upd) {
+  std::vector<node_id_t> &ptr = buffers[upd.first];
+  ptr.emplace_back(upd.second);
+  if (ptr.size() == buffer_size) { // full, so request flush
+    ptr[0] = buffer_size;
+    flush(ptr.data(), buffer_size*sizeof(node_id_t));
+    Node i = ptr[1];
+    ptr.clear();
+    ptr.push_back(first_idx);
+    ptr.push_back(i);
   }
 }
 
@@ -74,9 +74,13 @@ bool WorkQueue::get_data(data_ret_t &data) {
 
 flush_ret_t WorkQueue::force_flush() {
   for (auto & buffer : buffers) {
-    if (buffer[0] != first_idx) { // have stuff to flush
-      flush(buffer, buffer[0]*sizeof(node_id_t));
-      buffer[0] = first_idx;
+    if (buffer.size() != first_idx) { // have stuff to flush
+      buffer[0] = buffer.size();
+      flush(buffer.data(), buffer[0]*sizeof(node_id_t));
+      Node i = buffer[1];
+      buffer.clear();
+      buffer.push_back(0);
+      buffer.push_back(i);
     }
   }
 }

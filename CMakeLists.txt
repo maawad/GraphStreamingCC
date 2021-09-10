@@ -105,6 +105,7 @@ if(NOT Boost_FOUND)
       "Set BOOST_ROOT to a directory where Boost is installed\n"
       "or use -DAUTODOWNLOAD:BOOL=ON to automatically download")
   else()
+    message("Downloading boost")
     #Download boost
     download_project(
       PROJ boost
@@ -138,8 +139,9 @@ if(NOT Boost_FOUND)
     endif()
 
     #Set BOOST_ROOT in cache to what we just downloaded, FindBoost again
+    set(ENV{BOOST_LIBRARYDIR} ${boost_SOURCE_DIR}/../boost-install/lib)
     set(BOOST_ROOT "${boost_SOURCE_DIR}" CACHE STRING "" FORCE)
-    find_package(Boost 1.66.0)
+    find_package(Boost 1.66.0 REQUIRED)
   endif()
 endif()
 include_directories("${Boost_INCLUDE_DIR}")
@@ -266,41 +268,30 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif()
 
 add_executable(experiment_external
-  test/test_runner.cpp
   test/experiment/BCHMK_Graph.cpp
-  test/experiment/BCHMK_post_proc.cpp
-  test/util/graph_verifier.cpp
-  test/util/graph_gen.cpp
   graph.cpp
   supernode.cpp
+  work_queue.cpp
   graph_worker.cpp
   l0_sampling/sketch.cpp
   l0_sampling/update.cpp
   util.cpp)
 target_link_libraries(experiment_external PRIVATE xxHash::xxhash GTest::gtest)
 target_compile_definitions(experiment_external PRIVATE USE_FBT_F)
+target_compile_definitions(experiment_external PRIVATE PARALLEL_PP_F)
 # dependencies
 add_dependencies(experiment_external BufferTree)
 target_link_libraries(experiment_external PRIVATE libFastBufferTree.a)
 # optimize unless debug
-if (DEFINED ENV{DEBUG})
-  message("Disabling optimizations and enabling debug symbols")
-  target_compile_options(experiment_external PRIVATE -g -fopenmp)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_external PRIVATE -O3 -fopenmp)
   target_link_options(experiment_external PRIVATE -fopenmp)
-else ()
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(experiment_external PRIVATE -O3 -fopenmp)
-    target_link_options(experiment_external PRIVATE -fopenmp)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(experiment_external PRIVATE /O2)
-  endif()
-endif ()
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()
 
 add_executable(experiment_memory
-  test/test_runner.cpp
   test/experiment/BCHMK_Graph.cpp
-  test/util/graph_verifier.cpp
-  test/util/graph_gen.cpp
   graph.cpp
   supernode.cpp
   graph_worker.cpp
@@ -309,81 +300,30 @@ add_executable(experiment_memory
   l0_sampling/update.cpp
   util.cpp)
 target_link_libraries(experiment_memory PRIVATE xxHash::xxhash GTest::gtest)
-target_compile_definitions(experiment_memory PRIVATE)
+target_compile_definitions(experiment_memory PRIVATE PARALLEL_PP_F)
 # dependencies
 add_dependencies(experiment_memory BufferTree)
 target_link_libraries(experiment_memory PRIVATE libFastBufferTree.a)
 # optimize unless debug
-if (DEFINED ENV{DEBUG})
-  message("Disabling optimizations and enabling debug symbols")
-  target_compile_options(experiment_memory PRIVATE -g -fopenmp)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_memory PRIVATE -O3 -fopenmp)
   target_link_options(experiment_memory PRIVATE -fopenmp)
-else ()
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(experiment_memory PRIVATE -O3 -fopenmp)
-    target_link_options(experiment_memory PRIVATE -fopenmp)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(experiment_memory PRIVATE /O2)
-  endif()
-endif ()
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()
 
-add_executable(parallelPP
-    test/test_runner.cpp
-    test/util/graph_gen.cpp
-    test/util/graph_verifier.cpp
-    test/parallel_graph_test.cpp
-    graph.cpp
-    supernode.cpp
-    graph_worker.cpp
-    l0_sampling/sketch.cpp
-    l0_sampling/update.cpp
-    util.cpp)
-target_link_libraries(parallelPP PRIVATE xxHash::xxhash GTest::gtest)
-target_compile_definitions(parallelPP PRIVATE USE_FBT_F PARALLEL_PP_F VERIFY_SAMPLES_F)
-# dependencies
-add_dependencies(parallelPP BufferTree)
-target_link_libraries(parallelPP PRIVATE libFastBufferTree.a)
+add_executable(experiment_throughput
+  test/buffer_throughput_test.cpp
+  work_queue.cpp
+  test/test_runner.cpp
+)
+target_link_libraries(experiment_throughput PRIVATE GTest::gtest)
+add_dependencies(experiment_throughput BufferTree)
+target_link_libraries(experiment_throughput PRIVATE libFastBufferTree.a)
 # optimize unless debug
-if (DEFINED ENV{DEBUG})
-  message("Disabling optimizations and enabling debug symbols")
-  target_compile_options(parallelPP PRIVATE -g -fopenmp)
-  target_link_options(parallelPP PRIVATE -fopenmp)
-else ()
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(parallelPP PRIVATE -O3 -fopenmp)
-    target_link_options(parallelPP PRIVATE -fopenmp)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(parallelPP PRIVATE /O2)
-  endif()
-endif ()
-
-add_executable(memParallelPP
-        test/test_runner.cpp
-        test/util/graph_gen.cpp
-        test/util/graph_verifier.cpp
-        test/parallel_graph_test.cpp
-        graph.cpp
-        supernode.cpp
-        graph_worker.cpp
-        work_queue.cpp
-        l0_sampling/sketch.cpp
-        l0_sampling/update.cpp
-        util.cpp)
-target_link_libraries(memParallelPP PRIVATE xxHash::xxhash GTest::gtest)
-target_compile_definitions(memParallelPP PRIVATE PARALLEL_PP_F VERIFY_SAMPLES_F)
-# dependencies
-add_dependencies(memParallelPP BufferTree)
-target_link_libraries(memParallelPP PRIVATE libFastBufferTree.a)
-# optimize unless debug
-if (DEFINED ENV{DEBUG})
-  message("Disabling optimizations and enabling debug symbols")
-  target_compile_options(memParallelPP PRIVATE -g -fopenmp)
-  target_link_options(memParallelPP PRIVATE -fopenmp)
-else ()
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(memParallelPP PRIVATE -O3 -fopenmp)
-    target_link_options(memParallelPP PRIVATE -fopenmp)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(memParallelPP PRIVATE /O2)
-  endif()
-endif ()
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_throughput PRIVATE -O3 -fopenmp)
+  target_link_options(experiment_throughput PRIVATE -fopenmp)
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()
