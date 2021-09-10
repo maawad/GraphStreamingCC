@@ -1,4 +1,3 @@
-#include <gtest/gtest.h>
 #include <fstream>
 #include <string>
 #include <chrono>
@@ -7,6 +6,7 @@
 #include <thread>
 
 #include "../../include/graph.h"
+#include "../../include/binary_graph_stream.h"
 
 /*
  * Function which is run in a seperate thread and will query
@@ -69,37 +69,28 @@ void query_insertions(uint64_t total, Graph *g, std::chrono::steady_clock::time_
 int main(int argc, char** argv) {
   if (argc != 2) {
     std::cout << "Incorrect number of arguments. "
-                 "Expected two but got " << argc-1 << std::endl;
+                 "Expected one but got " << argc-1 << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // create the thread which will perform buffered IO for us
-  ifstream in{argv[1]};
+  BinaryGraphStream stream(argv[1], 32 * 1024);
 
-  Node num_nodes;
-  in >> num_nodes;
-  long m;
-  in >> m;
-  long total = m;
-  Node a, b;
-  uint8_t u;
+  Node num_nodes = stream.nodes();
+  long m         = stream.edges();
+  long total     = m;
   Graph g{num_nodes};
 
   auto start = std::chrono::steady_clock::now();
   std::thread querier(query_insertions, total, &g, start);
 
   while (m--) {
-    in >> std::skipws >> u >> a >> b;
-
-    if (u == INSERT)
-      g.update({{a, b}, INSERT});
-    else
-      g.update({{a, b}, DELETE});
+    g.update(stream.get_edge());
   }
 
   std::cout << "Starting CC" << std::endl;
 
-  uint64_t num_CC = g.connected_components().size();
+  uint64_t num_CC = g.parallel_connected_components().size();
 
   querier.join();
   printf("querier done\n");
@@ -120,4 +111,3 @@ int main(int argc, char** argv) {
 
   out << "Connected Components algorithm took " << CC_time << " and found " << num_CC << " CC\n";
   out.close();
-}
