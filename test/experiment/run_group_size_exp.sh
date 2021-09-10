@@ -3,6 +3,8 @@
 # The specific test we want to run
 executable=$1
 
+mkdir group_exp
+
 # for every input file specified on the command line
 for input in "${@:2}"
 do
@@ -15,32 +17,32 @@ do
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=40"              >> streaming.conf
 	echo "group_size=1"               >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g40_s1_data.txt
+	$executable	$input	
+	mv runtime_stats.txt group_exp/g40_s1_data.txt
 
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=20"              >> streaming.conf
 	echo "group_size=2"               >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g20_s2_data.txt
+	$executable	$input
+	mv runtime_stats.txt group_exp/g20_s2_data.txt
 
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=10"              >> streaming.conf
 	echo "group_size=4"               >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g10_s4_data.txt
+	$executable $input		
+	mv runtime_stats.txt group_exp/g10_s4_data.txt
 	
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=8"               >> streaming.conf
 	echo "group_size=5"               >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g8_s5_data.txt
+	$executable	$input
+	mv runtime_stats.txt group_exp/g8_s5_data.txt
 
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=4"               >> streaming.conf
 	echo "group_size=10"              >> streaming.conf
-	"$executable"			
-	mv runtime_data.txt test_`basename $input`_data/g4_s10_data.txt
+	$executable	$input
+	mv runtime_stats.txt group_exp/g4_s10_data.txt
 done
 
 # delete buffer tree data if it exists
