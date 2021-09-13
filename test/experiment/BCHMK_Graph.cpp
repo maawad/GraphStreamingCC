@@ -68,7 +68,7 @@ void query_insertions(uint64_t total, Graph *g, std::chrono::steady_clock::time_
 
 
 int main(int argc, char** argv) {
-  if (argc != 2) {
+  if (argc != 3) {
     std::cout << "Incorrect number of arguments. "
                  "Expected one but got " << argc-1 << std::endl;
     exit(EXIT_FAILURE);
@@ -76,11 +76,12 @@ int main(int argc, char** argv) {
 
   // create the thread which will perform buffered IO for us
   BinaryGraphStream stream(argv[1], 32 * 1024);
+  int factor = atoi(argv[2]);
 
   Node num_nodes = stream.nodes();
   long m         = stream.edges();
   long total     = m;
-  Graph g{num_nodes};
+  Graph g{num_nodes, factor};
 
   auto start = std::chrono::steady_clock::now();
   std::thread querier(query_insertions, total, &g, start);

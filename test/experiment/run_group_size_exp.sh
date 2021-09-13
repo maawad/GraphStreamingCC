@@ -11,19 +11,19 @@ do
 	echo ""
 	echo "input file: $input"
 	
-	mkdir test_`basename $input`_data
+	mkdir group_exp
 	ln -sf $input test/res/current_test.stream
         
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=40"              >> streaming.conf
 	echo "group_size=1"               >> streaming.conf
-	$executable	$input	
+	$executable $input	
 	mv runtime_stats.txt group_exp/g40_s1_data.txt
 
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=20"              >> streaming.conf
 	echo "group_size=2"               >> streaming.conf
-	$executable	$input
+	$executable $input
 	mv runtime_stats.txt group_exp/g20_s2_data.txt
 
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
@@ -35,13 +35,13 @@ do
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=8"               >> streaming.conf
 	echo "group_size=5"               >> streaming.conf
-	$executable	$input
+	$executable $input
 	mv runtime_stats.txt group_exp/g8_s5_data.txt
 
 	echo "path_prefix=./BUFFTREEDATA/" > streaming.conf
 	echo "num_groups=4"               >> streaming.conf
 	echo "group_size=10"              >> streaming.conf
-	$executable	$input
+	$executable $input
 	mv runtime_stats.txt group_exp/g4_s10_data.txt
 done
 

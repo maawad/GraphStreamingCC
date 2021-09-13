@@ -32,9 +32,9 @@ Graph::Graph(uint64_t num_nodes, int factor): num_nodes(num_nodes) {
   bf = new BufferTree(buffer_loc_prefix, (1<<23), 512, num_nodes, 1, GraphWorker::get_num_groups(), 8, true);
   GraphWorker::start_workers(this, bf, Supernode::get_size());
 #else
-  unsigned long node_size = 24*pow((log2(num_nodes)), 3);
-  node_size /= sizeof(node_id_t) * factor; // we want a fourth of a full buffer size
-  // node_size = factor + 2; // alternative when checking buffer size
+  // unsigned long node_size = 24*pow((log2(num_nodes)), 3);
+  // node_size /= sizeof(node_id_t) * factor; // we want a fourth of a full buffer size
+  unsigned long node_size = factor + 2; // alternative when checking buffer size
   wq = new WorkQueue(node_size, num_nodes, 2*GraphWorker::get_num_groups());
   GraphWorker::start_workers(this, wq, Supernode::get_size());
 #endif
