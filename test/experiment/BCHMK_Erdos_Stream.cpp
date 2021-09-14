@@ -141,7 +141,9 @@ int main(int argc, char** argv) {
   // (not in the two sketch updates we process per stream update)
   float ins_per_sec = (((float)(total)) / runtime.count());
   out << "Procesing " <<total << " updates took " << time_taken << " seconds, " << ins_per_sec << " per second\n";
+  std::cout << "Procesing " <<total << " updates took " << time_taken << " seconds, " << ins_per_sec << " per second\n";
 
   out << "Connected Components algorithm took " << CC_time << " and found " << num_CC << " CC\n";
+  std::cout << "Connected Components algorithm took " << CC_time << " and found " << num_CC << " CC\n";
   out.close();
 }

@@ -204,11 +204,11 @@ vector<set<Node>> Graph::parallel_connected_components() {
 #ifdef VERIFY_SAMPLES_F
   GraphVerifier verifier { cum_in };
 #endif
-  pair<Node,Node> query[num_nodes];
-  Node size[num_nodes];
+  vector<pair<Node,Node>> query(num_nodes);
+  vector<Node> size(num_nodes);
   vector<Node> reps(num_nodes);
-  fill(size, size + num_nodes, 1);
   for (Node i = 0; i < num_nodes; ++i) {
+    size[i] = 1; 
     reps[i] = i;
   }
 

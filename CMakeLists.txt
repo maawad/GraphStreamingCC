@@ -342,9 +342,43 @@ target_compile_definitions(experiment_erdos_stream PRIVATE PARALLEL_PP_F)
 add_dependencies(experiment_erdos_stream BufferTree)
 target_link_libraries(experiment_erdos_stream PRIVATE libFastBufferTree.a)
 # optimize unless debug
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  target_compile_options(experiment_erdos_stream PRIVATE -O3 -fopenmp)
+if (DEFINED ENV{DEBUG})
+  message("Disabling optimizations and enabling debug symbols")
+  target_compile_options(experiment_erdos_stream PRIVATE -g -fopenmp)
   target_link_options(experiment_erdos_stream PRIVATE -fopenmp)
-else()
-  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
-endif()
+else ()
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_compile_options(experiment_erdos_stream PRIVATE -O3 -fopenmp)
+    target_link_options(experiment_erdos_stream PRIVATE -fopenmp)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    target_compile_options(experiment_erdos_stream PRIVATE /O2)
+  endif()
+endif ()
+
+add_executable(experiment_erdos_external
+  test/experiment/BCHMK_Erdos_Stream.cpp
+  graph.cpp
+  supernode.cpp
+  graph_worker.cpp
+  work_queue.cpp
+  l0_sampling/sketch.cpp
+  l0_sampling/update.cpp
+  util.cpp)
+target_link_libraries(experiment_erdos_external PRIVATE xxHash::xxhash GTest::gtest)
+target_compile_definitions(experiment_erdos_external PRIVATE PARALLEL_PP_F)
+# dependencies
+add_dependencies(experiment_erdos_stream BufferTree)
+target_link_libraries(experiment_erdos_external PRIVATE libFastBufferTree.a)
+# optimize unless debug
+if (DEFINED ENV{DEBUG})
+  message("Disabling optimizations and enabling debug symbols")
+  target_compile_options(experiment_erdos_external PRIVATE -g -fopenmp)
+  target_link_options(experiment_erdos_external PRIVATE -fopenmp)
+else ()
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_compile_options(experiment_erdos_external PRIVATE -O3 -fopenmp)
+    target_link_options(experiment_erdos_external PRIVATE -fopenmp)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    target_compile_options(experiment_erdos_external PRIVATE /O2)
+  endif()
+endif ()
