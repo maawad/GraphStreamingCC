@@ -326,3 +326,25 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 else()
   message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
 endif()
+
+add_executable(experiment_erdos_stream
+  test/experiment/BCHMK_Erdos_Stream.cpp
+  graph.cpp
+  supernode.cpp
+  graph_worker.cpp
+  work_queue.cpp
+  l0_sampling/sketch.cpp
+  l0_sampling/update.cpp
+  util.cpp)
+target_link_libraries(experiment_erdos_stream PRIVATE xxHash::xxhash GTest::gtest)
+target_compile_definitions(experiment_erdos_stream PRIVATE PARALLEL_PP_F)
+# dependencies
+add_dependencies(experiment_erdos_stream BufferTree)
+target_link_libraries(experiment_erdos_stream PRIVATE libFastBufferTree.a)
+# optimize unless debug
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(experiment_erdos_stream PRIVATE -O3 -fopenmp)
+  target_link_options(experiment_erdos_stream PRIVATE -fopenmp)
+else()
+  message(SEND_ERROR "This exectuable is only meant to be run on *nix machines!")
+endif()
