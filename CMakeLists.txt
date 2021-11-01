@@ -181,7 +181,7 @@ add_library(GraphStreamingCC
   src/util.cpp)
 target_link_libraries(GraphStreamingCC PRIVATE xxHash::xxhash GTest::gtest)
 add_dependencies(GraphStreamingCC GutterTree)
-target_link_libraries(GraphStreamingCC PRIVATE libGutterTree.a)
+target_link_libraries(GraphStreamingCC INTERFACE libGutterTree.a)
 # optimize unless debug
 if (DEFINED ENV{DEBUG})
   message("Disabling optimizations and enabling debug symbols")
@@ -196,7 +196,16 @@ else ()
   endif()
 endif ()
 set_target_properties(GraphStreamingCC PROPERTIES PUBLIC_HEADER
-  "include/graph.h;include/binary_graph_stream.h;include/types.h"
+  "
+  include/binary_graph_stream.h;
+  include/bucket.h;
+  include/dsu.h;
+  include/graph.h;
+  include/graph_worker.h;
+  include/supernode.h;
+  include/types.h;
+  include/util.h
+  "
 )
 
 add_executable(tests
