@@ -196,7 +196,7 @@ else ()
   endif()
 endif ()
 set_target_properties(GraphStreamingCC PROPERTIES PUBLIC_HEADER
-  "include/binary_graph_stream.h;include/bucket.h;include/dsu.h;include/graph.h;include/graph_worker.h;include/supernode.h;include/types.h;include/util.h;l0_sampling/sketch.h;l0_sampling/update.h"
+  "include/binary_graph_stream.h;include/bucket.h;include/dsu.h;include/graph.h;include/graph_worker.h;include/supernode.h;include/types.h;include/util.h;include/l0_sampling/sketch.h;include/l0_sampling/update.h"
 )
 
 add_executable(tests
