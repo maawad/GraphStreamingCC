@@ -195,9 +195,6 @@ else ()
     target_compile_options(GraphStreamingCC PRIVATE /O2)
   endif()
 endif ()
-set_target_properties(GraphStreamingCC PROPERTIES PUBLIC_HEADER
-  "include/binary_graph_stream.h;include/bucket.h;include/dsu.h;include/graph.h;include/graph_worker.h;include/supernode.h;include/types.h;include/util.h;include/l0_sampling/sketch.h;include/l0_sampling/update.h"
-)
 
 add_executable(tests
   test/test_runner.cpp
@@ -309,7 +306,17 @@ endif ()
 #set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/GraphStreamingCC/prefix)
 
 # for use when building as an external project
+# The Directory commands are used to copy over our headers and the GutterTree headers
 install(TARGETS GraphStreamingCC
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
+  DIRECTORY include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  FILES_MATCHING PATTERN "*.h"
+)
+install(
+  DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/GutterTree/prefix/include/"
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  FILES_MATCHING PATTERN "*.h"
 )
