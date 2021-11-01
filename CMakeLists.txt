@@ -179,7 +179,7 @@ add_library(GraphStreamingCC
   src/l0_sampling/sketch.cpp
   src/l0_sampling/update.cpp
   src/util.cpp)
-target_link_libraries(GraphStreamingCC PRIVATE xxHash::xxhash GTest::gtest)
+target_link_libraries(GraphStreamingCC PUBLIC xxHash::xxhash GTest::gtest)
 add_dependencies(GraphStreamingCC GutterTree)
 target_link_libraries(GraphStreamingCC PUBLIC libGutterTree.a)
 # optimize unless debug
