@@ -202,7 +202,9 @@ add_library(GraphStreamingVerifyCC
   src/graph_worker.cpp
   src/l0_sampling/sketch.cpp
   src/l0_sampling/update.cpp
-  src/util.cpp)
+  src/util.cpp
+  test/util/file_graph_verifier.cpp
+  test/util/mat_graph_verifier.cpp)
 target_link_libraries(GraphStreamingVerifyCC PUBLIC xxHash::xxhash GTest::gtest)
 target_compile_definitions(GraphStreamingVerifyCC PRIVATE VERIFY_SAMPLES_F)
 add_dependencies(GraphStreamingVerifyCC GutterTree)
