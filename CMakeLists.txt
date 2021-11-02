@@ -314,7 +314,7 @@ endif ()
 
 # for use when building as an external project
 # The Directory commands are used to copy over our headers and the GutterTree headers
-install(TARGETS GraphStreamingCC
+install(TARGETS GraphStreamingCC GraphStreamingVerifyCC
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(
