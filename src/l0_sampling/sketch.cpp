@@ -69,11 +69,9 @@ void Sketch::update(const vec_t &update_idx) {
     for (unsigned j = 0; j < num_guesses; ++j) {
       unsigned bucket_id = i * num_guesses + j;
       if (Bucket_Boruvka::contains(col_index_hash, 1 << (j + 1))) {
-
-        std::cout << " [i,j]: " << i << ", " << j << ' ';
-        std::cout << ", update_idx = " << update_idx << ' ';
-        std::cout << ", Bucket Id = " << bucket_id << '\n';
-
+        // std::cout << " [i,j]: " << i << ", " << j << ' ';
+        // std::cout << ", update_idx = " << update_idx << ' ';
+        // std::cout << ", Bucket Id = " << bucket_id << '\n';
         Bucket_Boruvka::update(bucket_a[bucket_id], bucket_c[bucket_id],
                                update_idx, update_hash);
       } else
@@ -84,7 +82,7 @@ void Sketch::update(const vec_t &update_idx) {
 
 void Sketch::batch_update(const std::vector<vec_t> &updates) {
 
-  const bool use_threads = false;
+  const bool use_threads = true;
   if (use_threads) {
     std::thread update_threads[updates.size()];
 

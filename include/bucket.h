@@ -106,8 +106,8 @@ inline bool Bucket_Boruvka::is_good(const vec_t &a, const vec_hash_t &c,
 inline void Bucket_Boruvka::update(vec_t &a, vec_hash_t &c,
                                    const vec_t &update_idx,
                                    const vec_hash_t &update_hash) {
-  __atomic_xor_fetch(&a, update_idx, __ATOMIC_SEQ_CST);
-  __atomic_xor_fetch(&c, update_hash, __ATOMIC_SEQ_CST);
+  __atomic_xor_fetch(&a, update_idx, __ATOMIC_RELAXED);
+  __atomic_xor_fetch(&c, update_hash, __ATOMIC_RELAXED);
   // a ^= update_idx;
   // c ^= update_hash;
 }
