@@ -84,12 +84,20 @@ void Sketch::batch_update(const std::vector<vec_t> &updates) {
 
   const bool use_threads = true;
   if (use_threads) {
-    std::thread update_threads[updates.size()];
-
-    for (std::size_t i = 0; i < updates.size(); i++) {
-      update_threads[i] = std::thread([&] { update(updates[i]); });
+    const std::size_t subpatch_size{512};
+    const std::size_t num_subpatches{(updates.size() + subpatch_size - 1) /
+                                     subpatch_size};
+    std::thread update_threads[num_subpatches];
+    for (std::size_t i = 0; i < num_subpatches; i++) {
+      auto start = i * subpatch_size;
+      auto end = std::min(start + subpatch_size, updates.size());
+      update_threads[i] = std::thread([&] {
+        for (std::size_t j = start; j < end; j++) {
+          update(updates[j]);
+        }
+      });
     }
-    for (std::size_t i = 0; i < updates.size(); i++) {
+    for (std::size_t i = 0; i < num_subpatches; i++) {
       update_threads[i].join();
     }
   } else {

@@ -1,0 +1,1 @@
+./tests --gtest_filter=SketchTestSuite.TestBatchUpdate &>  tests.log
