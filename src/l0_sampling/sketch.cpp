@@ -69,6 +69,11 @@ void Sketch::update(const vec_t &update_idx) {
     for (unsigned j = 0; j < num_guesses; ++j) {
       unsigned bucket_id = i * num_guesses + j;
       if (Bucket_Boruvka::contains(col_index_hash, 1 << (j + 1))) {
+
+        std::cout << " [i,j]: " << i << ", " << j << ' ';
+        std::cout << ", update_idx = " << update_idx << ' ';
+        std::cout << ", Bucket Id = " << bucket_id << '\n';
+
         Bucket_Boruvka::update(bucket_a[bucket_id], bucket_c[bucket_id],
                                update_idx, update_hash);
       } else
@@ -78,17 +83,22 @@ void Sketch::update(const vec_t &update_idx) {
 }
 
 void Sketch::batch_update(const std::vector<vec_t> &updates) {
-  std::thread update_threads[updates.size()];
 
-  for (std::size_t i = 0; i < updates.size(); i++) {
-    update_threads[i] = std::thread([&] { update(updates[i]); });
+  const bool use_threads = false;
+  if (use_threads) {
+    std::thread update_threads[updates.size()];
+
+    for (std::size_t i = 0; i < updates.size(); i++) {
+      update_threads[i] = std::thread([&] { update(updates[i]); });
+    }
+    for (std::size_t i = 0; i < updates.size(); i++) {
+      update_threads[i].join();
+    }
+  } else {
+    for (const auto &update_idx : updates) {
+      update(update_idx);
+    }
   }
-  for (std::size_t i = 0; i < updates.size(); i++) {
-    update_threads[i].join();
-  }
-  // for (const auto& update_idx : updates) {
-  //   update(update_idx);
-  // }
 }
 
 std::pair<vec_t, SampleSketchRet> Sketch::query() {
